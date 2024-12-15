@@ -17,7 +17,6 @@ build/
 *.egg-info/
 
 # Model checkpoints and logs
-
 runs/
 *.pth
 *.pt
@@ -43,3 +42,5 @@ Thumbs.db
 
 # Training logs and results
 *.log
+# Do not ignore results.json as it contains our test metrics
+!results.json

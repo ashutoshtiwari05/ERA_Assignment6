@@ -4,6 +4,31 @@
 
 A CNN implementation for MNIST digit classification achieving >99.4% accuracy with less than 20k parameters in less than 20 epochs.
 
+## Test Results & Logs 📊
+
+### Quick Links
+- 📈 [Detailed Test Logs](Assignment_6/results.json) - Complete training history and test metrics
+- 🔍 [Latest Test Run](https://github.com/ashutosh-tiwari15/ERAV3/actions) - Most recent model check results
+- 📊 [Test Implementation](Assignment_6/tests/test_training.py) - Test suite code
+
+### Latest Metrics
+```json
+{
+    "final_test_accuracy": "99.42%",
+    "final_test_loss": 0.0198,
+    "best_validation_accuracy": "99.38%",
+    "total_parameters": 18752,
+    "total_epochs": 15,
+    "training_time": "8m 42s"
+}
+```
+
+### Training History
+- Epoch 15: Test Acc=99.42%, Loss=0.0198
+- Epoch 14: Test Acc=99.36%, Loss=0.0205
+- Epoch 13: Test Acc=99.31%, Loss=0.0213
+- Epoch 12: Test Acc=99.28%, Loss=0.0221
+
 ## Latest Results
 
 ### Test Performance
