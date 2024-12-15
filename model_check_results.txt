@@ -1,0 +1,5 @@
+Total Parameters: 19,098
+✅ Parameter count within limit
+✅ Model uses Batch Normalization
+✅ Model uses Dropout
+✅ Model uses Global Average Pooling (preferred)
