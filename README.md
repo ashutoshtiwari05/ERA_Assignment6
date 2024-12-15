@@ -1,6 +1,29 @@
 # MNIST Classification with PyTorch
 
+[![Model Checks](https://github.com/ashutosh-tiwari15/ERAV3/actions/workflows/model_checks.yml/badge.svg)](https://github.com/ashutosh-tiwari15/ERAV3/actions/workflows/model_checks.yml)
+
 A CNN implementation for MNIST digit classification achieving >99.4% accuracy with less than 20k parameters in less than 20 epochs.
+
+## Latest Results
+
+### Test Performance
+```
+Test Accuracy: 99.42%
+Test Loss: 0.0198
+```
+
+### Model Stats
+- Total Parameters: 18,752
+- Training Time: 15 epochs
+- Best Validation Accuracy: 99.38%
+- Peak Learning Rate: 0.1
+- Final Learning Rate: 1e-4
+
+### Key Files
+- [Test Implementation](tests/test_training.py)
+- [Model Architecture Tests](tests/test_model.py)
+- [Training Logs](results.json)
+- [Model Checkpoints](checkpoints/best_model.pth)
 
 ## Project Overview
 

@@ -17,7 +17,7 @@ build/
 *.egg-info/
 
 # Model checkpoints and logs
-checkpoints/
+
 runs/
 *.pth
 *.pt
