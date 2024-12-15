@@ -21,6 +21,8 @@ runs/
 *.pth
 *.pt
 *.ckpt
+# Do not ignore best model checkpoint
+!checkpoints/best_model.pth
 
 # IDE settings
 .vscode/
