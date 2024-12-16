@@ -84,14 +84,14 @@ def train_model():
         transforms.RandomRotation((-15, 15)),
         transforms.RandomAffine(
             degrees=0, 
-            translate=(0.1, 0.1), 
-            scale=(0.9, 1.1),
-            shear=(-5, 5)
+            translate=(0.12, 0.12),  # Slightly increased translation
+            scale=(0.85, 1.15),      # Wider scale range
+            shear=(-7, 7)            # Balanced shear
         ),
         transforms.ColorJitter(brightness=0.2, contrast=0.2),
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
-        transforms.RandomErasing(p=0.2)
+        transforms.RandomErasing(p=0.2, scale=(0.02, 0.15))  # Controlled erasing
     ])
     
     transform_test = transforms.Compose([
@@ -126,18 +126,18 @@ def train_model():
     
     optimizer = optim.SGD(
         model.parameters(),
-        lr=0.01,
-        momentum=0.9,
-        weight_decay=5e-4,
+        lr=0.015,          # Higher initial learning rate
+        momentum=0.95,     # Increased momentum
+        weight_decay=1e-4, # Adjusted weight decay
         nesterov=True
     )
     scheduler = OneCycleLR(
         optimizer,
-        max_lr=0.1,
-        epochs=20,
+        max_lr=0.2,        # Higher peak learning rate
+        epochs=15,         # Reduced epochs
         steps_per_epoch=len(train_loader),
-        pct_start=0.3,
-        div_factor=25,
+        pct_start=0.2,     # Faster warmup
+        div_factor=20,     # Steeper learning rate curve
         final_div_factor=1e4,
         anneal_strategy='cos'
     )
@@ -149,7 +149,7 @@ def train_model():
     best_accuracy = 0
     results = []
     
-    for epoch in range(20):
+    for epoch in range(15):  # Reduced epochs
         # Training phase
         model.train()
         losses = AverageMeter()
@@ -160,25 +160,40 @@ def train_model():
         
         for batch_idx, (data, target) in enumerate(pbar):
             data, target = data.to(device), target.to(device)
+            
+            # Implement gradient accumulation for larger effective batch size
+            effective_batch_size = 2  # Accumulate gradients for 2 batches
             optimizer.zero_grad()
             
-            # Forward pass
-            output = model(data)
-            loss = F.nll_loss(output, target)
+            # Split batch for gradient accumulation
+            split_size = data.size(0) // effective_batch_size
+            for i in range(effective_batch_size):
+                start_idx = i * split_size
+                end_idx = (i + 1) * split_size if i < effective_batch_size - 1 else data.size(0)
+                
+                batch_data = data[start_idx:end_idx]
+                batch_target = target[start_idx:end_idx]
+                
+                # Forward pass
+                output = model(batch_data)
+                loss = F.nll_loss(output, batch_target)
+                loss = loss / effective_batch_size  # Scale loss
+                loss.backward()
             
-            # Backward pass
-            loss.backward()
+            # Update weights after accumulation
             optimizer.step()
+            scheduler.step()
             
             # Update metrics
-            losses.update(loss.item(), data.size(0))
+            losses.update(loss.item() * effective_batch_size, data.size(0))
             batch_times.update(time.time() - end)
             end = time.time()
             
             # Update progress bar
             pbar.set_postfix({
                 'loss': f'{losses.avg:.4f}',
-                'batch_time': f'{batch_times.avg:.3f}s'
+                'batch_time': f'{batch_times.avg:.3f}s',
+                'lr': f'{scheduler.get_last_lr()[0]:.6f}'
             })
         
         # Validation phase (50 samples)
@@ -233,8 +248,6 @@ def train_model():
             if test_accuracy > best_accuracy:
                 best_accuracy = test_accuracy
                 print(f'New best accuracy: {best_accuracy:.2f}%')
-        
-        scheduler.step()
     
     # Print final results
     print('\nTraining completed!')
